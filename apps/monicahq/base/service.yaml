@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: monicahq          # app front-end
+  namespace: monicahq
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: monicahq
+  type: ClusterIP
+

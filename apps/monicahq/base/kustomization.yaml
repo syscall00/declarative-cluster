@@ -1,0 +1,10 @@
+resources:
+  - namespace.yaml
+  - pvc.yaml
+  - configmap.yaml
+  - monica-sealedsecret.yaml
+  - mariadb.yaml
+  - deployment.yaml
+  - ingress.yaml
+  - service.yaml
+patchesStrategicMerge: []   # (empty for now)

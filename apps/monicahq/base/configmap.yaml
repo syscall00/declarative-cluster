@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monica-env
+  namespace: monicahq
+data:
+  APP_ENV: "production"
+  APP_URL: "https://crm.infrazone.cc"
+  DB_HOST: "monica-mariadb"
+  DB_PORT: "3306"
+  DB_DATABASE: "monica"
+  DB_USERNAME: "monica"
+  LOG_CHANNEL: "stack"

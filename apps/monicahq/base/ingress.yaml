@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: monicahq
+  namespace: monicahq
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns   # created earlier
+spec:
+  rules:
+  - host: people.infrazone.cc
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: monicahq
+            port:
+              number: 80
+  tls:
+  - hosts: [people.infrazone.cc]
+    secretName: monica-tls

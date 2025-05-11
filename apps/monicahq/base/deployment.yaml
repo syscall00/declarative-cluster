@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monicahq
+  namespace: monicahq
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: monicahq}
+  template:
+    metadata:
+      labels: {app: monicahq}
+    spec:
+      containers:
+      - name: web
+        image: monica:4.1.2-apache
+        ports: [{containerPort: 80}]
+        envFrom:
+        - configMapRef: {name: monica-env}
+        - secretRef:  {name: monica-secrets}
+        volumeMounts:
+        - name: storage
+          mountPath: /var/www/html/storage
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: monica-storage

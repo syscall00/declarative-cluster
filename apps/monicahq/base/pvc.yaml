@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: monica-db
+  namespace: monicahq
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-path   # k3s default
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: monica-storage
+  namespace: monicahq
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path
