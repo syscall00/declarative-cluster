@@ -5,5 +5,13 @@ metadata:
   namespace: stirling-pdf
 data:
   TZ: "Europe/Rome"
-  DOCKER_ENABLE_SECURITY: "false"   # flip to true & add auth if exposing publicly
-  # Add OCR_LANGS, WORKER_THREADS, etc. per docs
+  DOCKER_ENABLE_SECURITY: "true"   # flip to true & add auth if exposing publicly
+  SECURITY_ENABLELOGIN: "true"
+  SECURITY_OAUTH2_ENABLED: "true"
+  SECURITY_OAUTH2_AUTOCREATEUSER: "true"
+  SECURITY_OAUTH2_BLOCKREGISTRATION: "false"
+  SECURITY_OAUTH2_ISSUER: "https://authentik.local-lab.theworkpc.com/application/o/stirling-pdf/"
+  SECURITY_OAUTH2_SCOPES: "openid, profile, email"
+  SECURITY_OAUTH2_USEASUSERNAME: "email"
+  SECURITY_OAUTH2_PROVIDER: "Authentik"
+  SECURITY_LOGINMETHOD: "oauth2"
