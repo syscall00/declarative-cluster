@@ -1,0 +1,5 @@
+resources:
+  # Jetstack publishes a single manifest containing CRDs + controller
+  - https://github.com/cert-manager/cert-manager/releases/download/v1.17.2/cert-manager.yaml
+  - clusterissuer.yaml
+  - cloudflare-token-sealedsecret.yaml

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stirling-pdf
+  namespace: stirling-pdf
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: stirling-pdf}
+  template:
+    metadata:
+      labels: {app: stirling-pdf}
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/stirling-tools/stirling-pdf:0.45.6   # latest stable :contentReference[oaicite:0]{index=0}
+        ports: [{containerPort: 8080}]
+        envFrom:
+        - configMapRef:
+            name: stirling-env
+        volumeMounts:
+        - name: cache
+          mountPath: /usr/share/stirling-pdf/cache
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: pdf-cache

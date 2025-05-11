@@ -1,0 +1,4 @@
+namespace: sealed-secrets        # only affects namespaced objects
+resources:
+  - namespace.yaml
+  - https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.29.0/controller.yaml
