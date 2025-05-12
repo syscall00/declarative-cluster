@@ -1,0 +1,15 @@
+# apps/immich/base/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-env
+  namespace: immich
+data:
+  TZ: Europe/Rome
+  PUID: "1000"
+  PGID: "1000"
+  # service discovery
+  DB_HOSTNAME: immich-postgres
+  REDIS_HOSTNAME: immich-redis
+  DB_DATABASE_NAME: immich
+  UPLOAD_LOCATION: /usr/src/app/upload

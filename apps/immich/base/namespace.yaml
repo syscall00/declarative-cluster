@@ -1,0 +1,5 @@
+# apps/immich/base/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: immich

@@ -1,0 +1,24 @@
+# apps/immich/base/library-nfs.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-library-nfs
+spec:
+  capacity: { storage: 5Ti }
+  accessModes: [ReadWriteMany]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""          # 👈 ← empty string = “class-less” PV
+  nfs:
+    server: 192.168.1.190
+    path: /volume1/homes
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: library
+  namespace: immich
+spec:
+  accessModes: [ReadWriteMany]
+  resources: { requests: { storage: 5Ti } }
+  volumeName: immich-library-nfs
+  storageClassName: ""          # 👈 matches the PV
