@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  - name: immich
+    repo: https://immich-app.github.io/immich-charts    # official repo :contentReference[oaicite:5]{index=5}
+    version: "0.9.3"   # pin a chart release tag :contentReference[oaicite:6]{index=6}
+    releaseName: immich
+    namespace: immich
+    valuesFile: values.yaml
+
+resources:
+  - namespace.yaml
+  - library-nfs.yaml
+  - db-sealed.yaml
+  - app-sealed.yaml

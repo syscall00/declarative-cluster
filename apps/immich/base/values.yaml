@@ -1,0 +1,28 @@
+image:
+  tag: "v1.132.0"          # match latest stable release :contentReference[oaicite:0]{index=0}
+
+env:
+  TZ: "Europe/Rome"
+
+redis:
+  enabled: true
+
+postgresql:
+  enabled: true
+  auth:
+    username: immich
+    existingSecret: immich-db         # created in step 5
+
+persistence:
+  library:
+    enabled: true
+    existingClaim: library            # the NFS PVC from step 3
+  upload:
+    enabled: true
+    size: 200Gi
+    storageClass: local-path
+
+# tell the chart where to find the external NAS read-only path
+externalLibrary:
+  enabled: true
+  path: /usr/src/app/external

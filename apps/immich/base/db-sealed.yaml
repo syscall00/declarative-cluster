@@ -1,0 +1,21 @@
+{
+  "kind": "SealedSecret",
+  "apiVersion": "bitnami.com/v1alpha1",
+  "metadata": {
+    "name": "immich-db",
+    "namespace": "immich",
+    "creationTimestamp": null
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "name": "immich-db",
+        "namespace": "immich",
+        "creationTimestamp": null
+      }
+    },
+    "encryptedData": {
+      "password": "AgB7bT0xsnTPL+w/yTyOoyvlWr+KWxJu641tE4ORgyM5BOVno+QTekNmZXARnYeNgI3Chg2glnBd79itUdGv5RlUOdSgFWtar/HHl7fDs2xUOrUt8loKHkzSBqHBNVu0lOW1EYtFI6bsBnKhQ7v9r9mv7lcZjMAaMjBn+mEnRuoIUetas9P1XaGiF8W6D26vGiPXo6GcKIpuxyr0Lfh3Nl41g99tJvrmjhCAAHDBNZ6nYQl+TPYt3fq8lauw6y8PKMpDxwwhrremTeUKk3AbgjurzTXd7XGVuPBEjI8AMPZFp0iAtXd5CKbYrh6AlZXVCD3Z+T45ntXPsaU3YfTAoSDnRThSiXBnBabaJimtCXRVtw+iPoSNqgGj2imswtwHutD9k6rdyCf0fUAw4PKekPXLEFgnS4cJ/DOJj63L3as57s3aorzzreLFjVrhTNtjxB5D/ChzphUT6KTnhn6jm5unxTlaRxa/fW6nd9Z6wCdg9gQCOrVrlXQrtBqcaeofP93huxiGH0P8IdB6KH/GMUjB4Jxs6PrdRUhK66pg/soXUtNjf+mgg4xxRSrhH6krTPpPlujiRBE08q0fUpSAkWvXn5TjwFHOjHo5Uj4d7zI9XoGvKl+LALUcWNT6Bp90ff7Y/cgLpb434Q3/bton5ddSnaHGguK7tAoM0yhXeV4oraNgRpVc7HJ72D3ggwn57agHiAApu5BKJFNwOwW/2nyYSbDp7e1Bl0ZxI2TXfc6QLNmDgK17FVZWfdg3Jg=="
+    }
+  }
+}

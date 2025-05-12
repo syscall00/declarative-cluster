@@ -4,7 +4,7 @@ kind: PersistentVolume
 metadata:
   name: immich-library-nfs
 spec:
-  capacity: { storage: 5Ti }
+  capacity: { storage: 1Ti }
   accessModes: [ReadWriteMany]
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""          # 👈 ← empty string = “class-less” PV
@@ -19,6 +19,6 @@ metadata:
   namespace: immich
 spec:
   accessModes: [ReadWriteMany]
-  resources: { requests: { storage: 5Ti } }
+  resources: { requests: { storage: 1Ti } }
   volumeName: immich-library-nfs
   storageClassName: ""          # 👈 matches the PV
