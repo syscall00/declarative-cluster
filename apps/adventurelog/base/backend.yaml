@@ -5,8 +5,8 @@ metadata:
   namespace: adventurelog
 spec:
   ports:
-  - port: 80
-    targetPort: 80
+  - port: 8000
+    targetPort: 8000
   selector:
     app: adventurelog-backend
   type: ClusterIP
