@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adventurelog-env
+  namespace: adventurelog
+data:
+  PUBLIC_SERVER_URL: "http://adventurelog-backend:8000"
+  ORIGIN: "https://travel.infrazone.cc"
+  FRONTEND_URL: "https://travel.infrazone.cc"
+  FRONTEND_PORT: "8015"
+  BACKEND_PORT: "8016"
+  BODY_SIZE_LIMIT: "Infinity"
+  PGHOST: "adventurelog-db"
+  POSTGRES_DB: "database"
+  POSTGRES_USER: "adventure"
+  POSTGRES_PASSWORD: "changeme123"
+  SECRET_KEY: "changeme123"
+  DJANGO_ADMIN_USERNAME: "admin"
+  DJANGO_ADMIN_PASSWORD: "admin"
+  DJANGO_ADMIN_EMAIL: "admin@example.com"
+  PUBLIC_URL: "https://travel.infrazone.cc"
+  CSRF_TRUSTED_ORIGINS: "https://travel.infrazone.cc"
+  DEBUG: "False"
+  DISABLE_REGISTRATION: "False"
