@@ -30,5 +30,7 @@ spec:
         envFrom:
         - configMapRef:
             name: adventurelog-env
+        - secretRef:
+            name: adventurelog-secrets
         ports:
         - containerPort: 3000

@@ -30,6 +30,8 @@ spec:
         envFrom:
         - configMapRef:
             name: adventurelog-env
+        - secretRef:
+            name: adventurelog-secrets
         volumeMounts:
         - name: media
           mountPath: /code/media

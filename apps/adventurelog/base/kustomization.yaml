@@ -2,6 +2,7 @@ resources:
   - namespace.yaml
   - pvc.yaml
   - configmap.yaml
+  - adventurelog-sealedsecret.yaml
   - db.yaml
   - backend.yaml
   - frontend.yaml
