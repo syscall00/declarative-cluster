@@ -1,0 +1,375 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: authentik
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: authentik-db-secret
+  namespace: authentik
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "YOUR_DB_PASSWORD"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-env
+  namespace: authentik
+data:
+  # Values matching your compose defaults; change as needed or mirror your .env
+  POSTGRES_USER: "authentik"
+  POSTGRES_DB: "authentik"
+
+  # Authentik DB/Redis connectivity for server & worker
+  AUTHENTIK_REDIS__HOST: "redis"
+  AUTHENTIK_POSTGRESQL__HOST: "postgresql"
+  AUTHENTIK_POSTGRESQL__USER: "authentik"
+  AUTHENTIK_POSTGRESQL__NAME: "authentik"
+
+  # If you used COMPOSE_PORT_* externally, you'll generally expose via Ingress/Service instead.
+  # Add any other non-secret .env keys here.
+---
+# Persistent storage claims for Authentik data directories
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authentik-media
+  namespace: authentik
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authentik-certs
+  namespace: authentik
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authentik-templates
+  namespace: authentik
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+# PostgreSQL as a StatefulSet with its own PVC
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: authentik
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  clusterIP: None
+  selector:
+    app: postgresql
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql
+  namespace: authentik
+spec:
+  serviceName: postgresql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+        - name: postgres
+          image: docker.io/library/postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          envFrom:
+            - configMapRef:
+                name: authentik-env
+            - secretRef:
+                name: authentik-db-secret
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+---
+# Redis as a StatefulSet with persistence
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: authentik
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis
+  clusterIP: None
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: authentik
+spec:
+  serviceName: redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: docker.io/library/redis:alpine
+          imagePullPolicy: IfNotPresent
+          args: ["--save", "60", "1", "--loglevel", "warning"]
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - redis-cli ping | grep PONG
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - redis-cli ping | grep PONG
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
+---
+# Authentik server
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik
+  namespace: authentik
+spec:
+  selector:
+    app: authentik-server
+  ports:
+    - name: http
+      port: 9000
+      targetPort: 9000
+    - name: https
+      port: 9443
+      targetPort: 9443
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-server
+  namespace: authentik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-server
+  template:
+    metadata:
+      labels:
+        app: authentik-server
+    spec:
+      containers:
+        - name: server
+          image: ghcr.io/goauthentik/server:2024.8.2
+          imagePullPolicy: IfNotPresent
+          args: ["server"]
+          ports:
+            - containerPort: 9000
+              name: http
+            - containerPort: 9443
+              name: https
+          envFrom:
+            - configMapRef:
+                name: authentik-env
+            - secretRef:
+                name: authentik-db-secret
+          env:
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-db-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: media
+              mountPath: /media
+            - name: templates
+              mountPath: /templates
+          # Authentik exposes health endpoints; adjust if different in your version.
+          readinessProbe:
+            httpGet:
+              path: /-/health/ready
+              port: 9000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /-/health/live
+              port: 9000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: authentik-media
+        - name: templates
+          persistentVolumeClaim:
+            claimName: authentik-templates
+---
+# Authentik worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-worker
+  namespace: authentik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-worker
+  template:
+    metadata:
+      labels:
+        app: authentik-worker
+    spec:
+      # If you truly need docker.sock inside k8s, you can mount a hostPath below,
+      # but it's generally discouraged. Omitted by default for safety.
+      containers:
+        - name: worker
+          image: ghcr.io/goauthentik/server:2024.8.2
+          imagePullPolicy: IfNotPresent
+          args: ["worker"]
+          envFrom:
+            - configMapRef:
+                name: authentik-env
+            - secretRef:
+                name: authentik-db-secret
+          env:
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-db-secret
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: media
+              mountPath: /media
+            - name: certs
+              mountPath: /certs
+            - name: templates
+              mountPath: /templates
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: authentik-media
+        - name: certs
+          persistentVolumeClaim:
+            claimName: authentik-certs
+        - name: templates
+          persistentVolumeClaim:
+            claimName: authentik-templates
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+  namespace: authentik
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authentik-redirect
+  namespace: authentik
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: authentik-redirect@kubernetescrd
+spec:
+  rules:
+  - host: sso.infrazone.cc
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: authentik
+            port:
+              number: 9000
