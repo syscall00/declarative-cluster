@@ -14,6 +14,15 @@ stringData:
   POSTGRES_PASSWORD: "YOUR_DB_PASSWORD"
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: authentik-secret-key
+  namespace: authentik
+type: Opaque
+stringData:
+  AUTHENTIK_SECRET_KEY: "bJXe1hkM3sAqzNW434uD0uVnCBRVXO7nHppC/zHWTi3umsMBDyQhcINChUBdR9scG7GdEMMXKd3ynaph"
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: authentik-env
