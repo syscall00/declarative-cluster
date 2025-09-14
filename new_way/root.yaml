@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  source:
+    path: new_way/apps/
+    repoURL: https://github.com/syscall00/declarative-cluster.git
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      allowEmpty: truej
+      selfHeal: true
