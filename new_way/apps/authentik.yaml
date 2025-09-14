@@ -327,6 +327,9 @@ spec:
                 name: authentik-env
             - secretRef:
                 name: authentik-db-secret
+            - secretRef:
+                name: authentik-secret-key
+
           env:
             - name: AUTHENTIK_POSTGRESQL__PASSWORD
               valueFrom:
